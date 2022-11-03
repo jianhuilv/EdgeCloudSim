@@ -45,7 +45,11 @@ public class SampleMobileServerManager extends MobileServerManager{
 	@Override
 	public void initialize() {
 	}
-	
+
+	public List<List<MobileVM>> getHostList() {
+		return vmList;
+	}
+
 	@Override
 	public VmAllocationPolicy getVmAllocationPolicy(List<? extends Host> list, int dataCenterIndex) {
 		return new MobileVmAllocationPolicy_Custom(list, dataCenterIndex);

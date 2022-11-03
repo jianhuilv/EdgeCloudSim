@@ -52,7 +52,7 @@ public class MainApp {
 			configFile = "scripts/sample_app3/config/default_config.properties";
 			applicationsFile = "scripts/sample_app3/config/applications.xml";
 			edgeDevicesFile = "scripts/sample_app3/config/edge_devices.xml";
-			outputFolder = "sim_results/ite" + iterationNumber;
+			outputFolder = "sim_results_3/ite" + iterationNumber;
 		}
 
 		//load settings from configuration file
@@ -105,7 +105,7 @@ public class MainApp {
 						
 						// Generate EdgeCloudSim Simulation Manager
 						SimManager manager = new SimManager(sampleFactory, j, simScenario, orchestratorPolicy);
-						
+
 						// Start simulation
 						manager.startSimulation();
 					}

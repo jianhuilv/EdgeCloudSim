@@ -21,6 +21,8 @@
 
 package edu.boun.edgecloudsim.applications.sample_app3;
 
+import edu.boun.edgecloudsim.edge_client.mobile_processing_unit.MobileVM;
+import edu.boun.edgecloudsim.edge_server.EdgeVM;
 import org.cloudbus.cloudsim.UtilizationModel;
 import org.cloudbus.cloudsim.UtilizationModelFull;
 import org.cloudbus.cloudsim.Vm;
@@ -198,41 +200,28 @@ public class SampleMobileDeviceManager extends MobileDeviceManager {
 				(int)task.getCloudletFileSize(),
 				(int)task.getCloudletOutputSize());
 
-		int nextHopId = SimManager.getInstance().getEdgeOrchestrator().getDeviceToOffload(task);
-		
-		if(nextHopId == SimSettings.GENERIC_EDGE_DEVICE_ID){
-			delay = networkModel.getUploadDelay(task.getMobileDeviceId(), nextHopId, task);
-			vmType = SimSettings.VM_TYPES.EDGE_VM;
-			nextEvent = REQUEST_RECEIVED_BY_EDGE_DEVICE;
-			delayType = NETWORK_DELAY_TYPES.WLAN_DELAY;
-			nextDeviceForNetworkModel = SimSettings.GENERIC_EDGE_DEVICE_ID;
-		}
-		else if(nextHopId == SimSettings.MOBILE_DATACENTER_ID){
-			vmType = VM_TYPES.MOBILE_VM;
-			nextEvent = REQUEST_RECEIVED_BY_MOBILE_DEVICE;
-			
-			/*
-			 * TODO: In this scenario device to device (D2D) communication is ignored.
-			 * If you want to consider D2D communication, you should calculate D2D
-			 * network delay here.
-			 * 
-			 * You should also add D2D_DELAY to the following enum in SimSettings
-			 * public static enum NETWORK_DELAY_TYPES { WLAN_DELAY, MAN_DELAY, WAN_DELAY }
-			 * 
-			 * If you want to get statistics of the D2D networking, you should modify
-			 * SimLogger in a way to consider D2D_DELAY statistics.
-			 */
-		}
-		else {
-			SimLogger.printLine("Unknown nextHopId! Terminating simulation...");
-			System.exit(0);
-		}
-		
-		if(delay>0 || nextHopId == SimSettings.MOBILE_DATACENTER_ID){
-			
-			Vm selectedVM = SimManager.getInstance().getEdgeOrchestrator().getVmToOffload(task, nextHopId);
-			
+
+
+			int nextHopId = SimSettings.GENERIC_EDGE_DEVICE_ID;
+			Vm selectedVM = SimManager.getInstance().getEdgeOrchestrator().getVmToOffload(task, 0);
 			if(selectedVM != null){
+
+				// 设置基本参数
+				if (selectedVM instanceof EdgeVM) {
+					vmType = SimSettings.VM_TYPES.EDGE_VM;
+					nextEvent = REQUEST_RECEIVED_BY_EDGE_DEVICE;
+					delayType = NETWORK_DELAY_TYPES.WLAN_DELAY;
+					nextDeviceForNetworkModel = SimSettings.GENERIC_EDGE_DEVICE_ID;
+					nextHopId = SimSettings.GENERIC_EDGE_DEVICE_ID;
+				}
+				else if (selectedVM instanceof MobileVM){
+					vmType = VM_TYPES.MOBILE_VM;
+					nextEvent = REQUEST_RECEIVED_BY_MOBILE_DEVICE;
+					nextHopId = SimSettings.MOBILE_DATACENTER_ID;
+				}
+
+				// 赋值，运行仿真
+
 				//set related host id
 				task.setAssociatedDatacenterId(nextHopId);
 
@@ -257,14 +246,8 @@ public class SampleMobileDeviceManager extends MobileDeviceManager {
 			}
 			else{
 				//SimLogger.printLine("Task #" + task.getCloudletId() + " cannot assign to any VM");
-				SimLogger.getInstance().rejectedDueToVMCapacity(task.getCloudletId(), CloudSim.clock(), vmType.ordinal());
+				SimLogger.getInstance().rejectedDueToVMCapacity(task.getCloudletId(), CloudSim.clock(), SimSettings.VM_TYPES.UNKNOWN_VM.ordinal());
 			}
-		}
-		else
-		{
-			//SimLogger.printLine("Task #" + task.getCloudletId() + " cannot assign to any VM");
-			SimLogger.getInstance().rejectedDueToBandwidth(task.getCloudletId(), CloudSim.clock(), vmType.ordinal(), delayType);
-		}
 	}
 	
 	private void submitTaskToVm(Task task, SimSettings.VM_TYPES vmType) {

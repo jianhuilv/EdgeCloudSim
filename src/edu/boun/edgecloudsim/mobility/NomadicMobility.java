@@ -39,7 +39,7 @@ public class NomadicMobility extends MobilityModel {
 	@Override
 	public void initialize() {
 		treeMapArray = new ArrayList<TreeMap<Double, Location>>();
-		
+
 		ExponentialDistribution[] expRngList = new ExponentialDistribution[SimSettings.getInstance().getNumOfEdgeDatacenters()];
 
 		//create random number generator for each place
@@ -54,7 +54,7 @@ public class NomadicMobility extends MobilityModel {
 			
 			expRngList[i] = new ExponentialDistribution(SimSettings.getInstance().getMobilityLookUpTable()[placeTypeIndex]);
 		}
-		
+
 		//initialize tree maps and position of mobile devices
 		for(int i=0; i<numberOfMobileDevices; i++) {
 			treeMapArray.add(i, new TreeMap<Double, Location>());
@@ -72,16 +72,18 @@ public class NomadicMobility extends MobilityModel {
 			//start locating user shortly after the simulation started (e.g. 10 seconds)
 			treeMapArray.get(i).put(SimSettings.CLIENT_ACTIVITY_START_TIME, new Location(placeTypeIndex, wlan_id, x_pos, y_pos));
 		}
-		
+
 		for(int i=0; i<numberOfMobileDevices; i++) {
 			TreeMap<Double, Location> treeMap = treeMapArray.get(i);
 
 			while(treeMap.lastKey() < SimSettings.getInstance().getSimulationTime()) {				
 				boolean placeFound = false;
 				int currentLocationId = treeMap.lastEntry().getValue().getServingWlanId();
+
 				double waitingTime = expRngList[currentLocationId].sample();
 				
 				while(placeFound == false){
+
 					int newDatacenterId = SimUtils.getRandomNumber(0,SimSettings.getInstance().getNumOfEdgeDatacenters()-1);
 					if(newDatacenterId != currentLocationId){
 						placeFound = true;

@@ -4,9 +4,9 @@
 %--------------------------------------------------------------
 function [ret_val] = getConfiguration(argType)
     if(argType == 1)
-        ret_val = 'D:\sim_results';
+        ret_val = 'D:\edgeCloudSimFork\EdgeCloudSim\sim_results';
     elseif(argType == 2)
-        ret_val = 10; %Number of iterations
+        ret_val = 1; %Number of iterations
     elseif(argType == 3)
         ret_val = 200; %min number of mobile device
     elseif(argType == 4)

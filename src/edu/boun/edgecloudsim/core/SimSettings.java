@@ -36,7 +36,7 @@ public class SimSettings {
 	public static final double CLIENT_ACTIVITY_START_TIME = 10;
 
 	//enumarations for the VM types
-	public static enum VM_TYPES { MOBILE_VM, EDGE_VM, CLOUD_VM }
+	public static enum VM_TYPES { MOBILE_VM, EDGE_VM, CLOUD_VM,UNKNOWN_VM }
 
 	//enumarations for the VM types
 	public static enum NETWORK_DELAY_TYPES { WLAN_DELAY, MAN_DELAY, WAN_DELAY, GSM_DELAY }
